@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+
+from math import *
+import sys
+
+
+def prompt(nb1, nb2, option):
+    if (option == 1):
+        print("Midpoint:")
+        print("I" + sys.argv[1] + " = %.10f\ndiff = %.10f\n" % (nb1, nb2))
+    elif (option == 2):
+        print("Trapezoidal:")
+        print("I" + sys.argv[1] + " = %.10f\ndiff = %.10f\n" % (nb1, nb2))
+    else:
+        print("Simpson:")
+        print("I" + sys.argv[1] + " = %.10f\ndiff = %.10f" % (nb1, nb2))
+
+
+def fonction(x, n):
+    a = 0
+    n = float(n)
+    result = 1
+    while a <= n:
+        if x != 0:
+            result *= sin(x / ((2 * a) + 1)) / (x / ((2 * a) + 1))
+        a += 1
+    return result
+
+
+def check_int():
+    ac = len(sys.argv)
+    i = 1
+    j = 1
+    while i < ac:
+        try:
+            int(sys.argv[i])
+        except ValueError:
+            return 84
+        i += 1
+    if j == 1:
+        return 0
+    else:
+        return 84
+
+
+def rectangles(n):
+    counter = 0
+    result = 0.0
+    h = 5000.0 / 10000.0
+    while counter <= 10000 - 1:
+        x = counter * h
+        result += fonction(x, n)
+        counter = counter + 1
+    result = result * h
+    diff = result - (pi/2)
+    prompt(result, diff, 1)
+
+
+def trapezoidal(n):
+    counter = 1
+    result = 0.0
+    h = 5000.0 / 10000.0
+    while counter < 10000:
+        result += fonction(counter * h, n)
+        counter += 1
+    result = 0.25 * (fonction(0, n) + fonction(5000, n) + 2 * result)
+    diff = result - (pi/2)
+    prompt(result, -1 * diff, 2)
+
+
+def simpson(n):
+    c = 1
+    r1 = 0.0
+    h = 5000.0 / 10000.0
+    while c < 10000:
+        r1 = r1 + fonction(c * h, n)
+        c = c + 1
+    r2 = 0.0
+    c = 0
+    while c < 10000:
+        r2 = r2 + fonction(c * h + (h * 0.5), n)
+        c = c + 1
+    result = 5000.0 / 60000.0 * (fonction(0, n) + fonction(5000, n) + 2 * r1 + 4 * r2)
+    diff = result - (pi/2)
+    prompt(result, -1 * diff, 3)
+
+
+if __name__=="__main__":
+    if len(sys.argv) != 2:
+        exit(84)
+    if sys.argv[1] != "-h" and check_int() == 84:
+        exit(84)
+    if sys.argv[1] == "-h":
+        print("USAGE\n    ./110borwein n\n\nDESCRIPTION\n    n    constant defining the integral to be computed\n")
+    if int(sys.argv[1]) < 0:
+        exit(84)
+    rectangles(sys.argv[1])
+    trapezoidal(sys.argv[1])
+    simpson(sys.argv[1])
